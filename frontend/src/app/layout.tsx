@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+       <body className={inter.className} suppressHydrationWarning={true}>
         <Providers>
           {children}
           <Toaster />
