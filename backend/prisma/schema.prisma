@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String     @id @default(cuid())
+  name           String
+  email          String     @unique
+  password       String
+  role           String     @default("member")
+  avatarColor    String     @default("#2563eb")
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  adminProjects  Project[]  @relation("ProjectAdmin")
+  memberProjects Project[]  @relation("ProjectMembers")
+  assignedTasks  Task[]     @relation("AssignedTasks")
+  createdTasks   Task[]     @relation("CreatedTasks")
+  activities     Activity[] @relation("ActorActivities")
+
+  @@index([email])
+}
+
+model Project {
+  id          String     @id @default(cuid())
+  title       String
+  description String     @default("")
+  adminId     String
+  admin       User       @relation("ProjectAdmin", fields: [adminId], references: [id], onDelete: Cascade)
+  members     User[]     @relation("ProjectMembers")
+  tasks       Task[]
+  activities  Activity[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([adminId])
+  @@index([title])
+}
+
+model Task {
+  id          String     @id @default(cuid())
+  title       String
+  description String     @default("")
+  dueDate     DateTime
+  priority    String     @default("medium")
+  status      String     @default("todo")
+  assignedToId String
+  assignedTo  User       @relation("AssignedTasks", fields: [assignedToId], references: [id])
+  projectId   String
+  project     Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdById String
+  createdBy   User       @relation("CreatedTasks", fields: [createdById], references: [id])
+  activities  Activity[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([projectId])
+  @@index([assignedToId])
+  @@index([status])
+  @@index([priority])
+  @@index([dueDate])
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  type      String
+  message   String
+  actorId   String
+  actor     User     @relation("ActorActivities", fields: [actorId], references: [id])
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  taskId    String?
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+
+  @@index([type])
+  @@index([projectId])
+}

@@ -1,0 +1,23 @@
+{
+  "name": "team-task-manager",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Production-ready full-stack team task manager with Next.js, Express, PostgreSQL, JWT auth, and Socket.io.",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace backend\" \"npm run dev --workspace frontend\"",
+    "build": "npm run build --workspace frontend",
+    "lint": "npm run lint --workspace frontend",
+    "typecheck": "npm run typecheck --workspace frontend",
+    "start": "npm run start --workspace backend"
+  },
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  }
+}
