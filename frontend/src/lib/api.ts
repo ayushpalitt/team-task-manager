@@ -1,8 +1,14 @@
 import axios from "axios";
 import { useAuthStore } from "@/store/auth-store";
 
+const apiBaseUrl =
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === "production"
+    ? "https://team-task-manager-ne5e.onrender.com/api"
+    : "http://localhost:5000/api");
+
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api",
+  baseURL: apiBaseUrl,
   withCredentials: true
 });
 
