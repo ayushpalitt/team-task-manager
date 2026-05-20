@@ -14,17 +14,35 @@ import projectRoutes from "./routes/project.routes.js";
 import taskRoutes from "./routes/task.routes.js";
 import userRoutes from "./routes/user.routes.js";
 
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  if (env.clientUrls.includes(origin)) return true;
+
+  try {
+    const hostname = new URL(origin).hostname;
+    return hostname.endsWith(".vercel.app") && env.clientUrls.some((url) => url.includes(".vercel.app"));
+  } catch (_error) {
+    return false;
+  }
+};
+
 export const createApp = () => {
   const app = express();
 
   app.set("trust proxy", 1);
   app.use(helmet());
-  app.use(
-    cors({
-      origin: env.clientUrl,
-      credentials: true
-    })
-  );
+  const corsOptions = {
+    origin(origin, callback) {
+      if (isAllowedOrigin(origin)) {
+        callback(null, true);
+        return;
+      }
+      callback(new Error(`CORS blocked origin: ${origin}`));
+    },
+    credentials: true
+  };
+  app.use(cors(corsOptions));
+  app.options("*", cors(corsOptions));
   app.use(compression());
   app.use(express.json({ limit: "1mb" }));
   app.use(cookieParser());
